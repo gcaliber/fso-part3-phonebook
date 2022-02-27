@@ -1,7 +1,9 @@
+const cors = require('cors')
 const express = require('express')
 var morgan = require('morgan')
 const app = express()
 
+app.use(cors())
 const logger = morgan((tokens, req, res) => {
   return [
     tokens.method(req, res),
