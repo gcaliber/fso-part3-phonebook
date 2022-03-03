@@ -8,7 +8,7 @@ if (process.argv.length < 3) {
 const password = process.argv[2]
 
 // const url = `mongodb+srv://inverimus:${password}@cluster0.xeo4c.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-const url = `mongodb://fso:${password}@gcaliber.duckdns.org:3389/fullstack`
+const url = `mongodb://mike:${password}@gcaliber.duckdns.org:3389/fullstack?authSource=admin&retryWrites=true`
 
 // db.createUser({user: 'fso', pwd: 'sepa', roles: [{ role: 'readWrite', db:'fullstack'}]})
 
