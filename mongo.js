@@ -7,8 +7,11 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2]
 
-const url = `mongodb+srv://inverimus:${password}@cluster0.xeo4c.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-             
+// const url = `mongodb+srv://inverimus:${password}@cluster0.xeo4c.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+const url = `mongodb://fso:${password}@gcaliber.duckdns.org/fullstack`
+
+// db.createUser({user: 'fso', pwd: 'sepa', roles: [{ role: 'readWrite', db:'fullstack'}]})
+
 mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
