@@ -8,7 +8,10 @@ content-type: application/json
 
 ###
 
-DELETE http://localhost:3001/api/persons/6220d2aaa2c57cde41e1c68e
+POST http://localhost:3001/api/persons HTTP/1.1
+
+###
+DELETE http://localhost:3001/api/persons/6220eb4787a08870aea4a4e0
 
 ###
 
@@ -17,3 +20,13 @@ GET http://localhost:3001/api/persons
 ###
 
 GET http://localhost:3001/api/persons/1
+
+###
+
+PUT http://localhost:3001/api/persons/6220ff2d07b6992b8b338010
+content-type: application/json
+
+{
+  "name": "Billy Testerman",
+  "number": "123-456-789"
+}

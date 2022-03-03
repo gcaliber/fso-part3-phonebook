@@ -4,8 +4,9 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 
-app.use(express.static('build'))
 app.use(cors())
+app.use(express.static('build'))
+app.use(express.json())
 app.use(morgan((tokens, req, res) => {
   return [
     tokens.method(req, res),
@@ -16,7 +17,19 @@ app.use(morgan((tokens, req, res) => {
     JSON.stringify(req.body)
   ].join(' ')
 }))
-app.use(express.json())
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+app.use(errorHandler)
+
 
 const Person = require('./models/person')
 
@@ -34,28 +47,36 @@ app.get('/api/info', (request, response) => {
 
 app.get('/api/persons/:id', (request, response) => {
   Person.findById(request.params.id)
-    .then(person =>
-      response.json(person)
-    )
-    .catch(error => {
-      response.status(404).end()
+    .then(person => {
+      if (person) {
+        response.json(person)
+      }
+      else {
+        response.status(404).end()
+      }
     })
+    .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+const validateRequest = (request) => {
   const {name, number} = request.body
 
-  if (!request.body) {
-    return response.status(400).json({error: 'request body missing'})
-  }
+  if (!request.body) 
+    return { valid: false, error: {error: 'request body missing'}}
 
-  if (!name) {
-    return response.status(400).json({error: 'name required'})
-  }
+  if (!name)
+    return { valid: false, error: {error: 'name required'}}
 
-  if (!number) {
-    return response.status(400).json({error: 'number required'})
-  }
+  if (!number)
+    return { valid: false, error: {error: 'number required'}}
+
+  return { valid: true, error: {}}
+}
+
+app.post('/api/persons', (request, response) => {
+  const {valid, error} = validateRequest(request)
+  if (!valid)
+    return response.status(400).json(error)
 
   // Person.findOne({ name: name })
   //   .then(found => {
@@ -75,8 +96,8 @@ app.post('/api/persons', (request, response) => {
   // })
 
   const person = new Person({
-    name: name,
-    number: number,
+    name: request.body.name,
+    number: request.body.number,
   })
 
   person.save().then(savedPerson => {
@@ -84,16 +105,23 @@ app.post('/api/persons', (request, response) => {
   })
 })
 
+app.put('/api/persons/:id', (request, response) => {
+  const {valid, error} = validateRequest(request)
+  if (!valid)
+    return response.status(400).json(error)
+  
+  const { name, number } = request.body
+  Person.findByIdAndUpdate(request.params.id, {name: name, number: number})
+    .then(person => {
+      return response.json({name: name, number: number, id: request.params.id})
+    })
+})
+
 app.delete('/api/persons/:id', (request, response) => {
-  Person.findByIdAndDelete(request.params.id, (error) => {
-      if (error) {
-        console.log(error)
-      }
-      else {
-        console.log("Successful deletion")
-      }
-  })  
-  response.status(204).end()
+  Person.findByIdAndDelete(request.params.id)
+    .then(
+      response.status(204).end()
+    )
 })
 
 const PORT = process.env.PORT
