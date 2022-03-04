@@ -4,8 +4,8 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 
-app.use(cors())
 app.use(express.static('build'))
+app.use(cors())
 app.use(express.json())
 app.use(morgan((tokens, req, res) => {
   return [
@@ -17,6 +17,7 @@ app.use(morgan((tokens, req, res) => {
     JSON.stringify(req.body)
   ].join(' ')
 }))
+
 
 const Person = require('./models/person')
 
@@ -46,28 +47,39 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 app.post('/api/persons', (request, response, next) => {
-  const person = new Person({
-    name: request.body.name,
-    number: request.body.number,
-  })
+  Person.findOne({ name: request.body.name })
+    .then(found => {
+      if (found) {
+        throw {
+          name: "ValidationError", 
+          message: "ValidationError: Name already in database. Names must be unique."
+        }
+      }
+      else {
+        const person = new Person({
+          name: request.body.name,
+          number: request.body.number,
+        })
 
-  person.save()
-    .then(savedPerson => {
-      return response.json(savedPerson)
-    })
-    .catch(error => next(error))
+        person.save().then(savedPerson => {
+          return response.json(savedPerson)
+        })
+        .catch(error => next(error))
+      }
+    
+  })
+  .catch(error => next(error))
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndUpdate(request.params.id, request.body, {returnDocument: 'after'})
-    .then(person => {
-      return response.json(person)
-    })
+    .then(person => response.json(person))
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(response.status(204))
+    .then(() => response.status(204).end())
     .catch(error => next(error))
 })
 

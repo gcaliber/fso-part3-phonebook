@@ -20,7 +20,13 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    minLength: 3,
+    minLength: 8,
+    validate: {
+      validator: v => {
+        return (v[2] === '-' || v[3] === '-') &&
+          [...v].filter(c => /[^\d]/.test(c)).toString() === '-'
+      }
+    },
     required: true
   }
 })

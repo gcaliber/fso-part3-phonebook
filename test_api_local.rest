@@ -2,8 +2,8 @@ POST http://localhost:3001/api/persons HTTP/1.1
 content-type: application/json
 
 {
-  "name": "oh",
-  "number": "777777777"
+  "name": "abc",
+  "number": "77-7777777"
 }
 
 ###
@@ -11,7 +11,7 @@ content-type: application/json
 POST http://localhost:3001/api/persons HTTP/1.1
 
 ###
-DELETE http://localhost:3001/api/persons/6220eb4787a08870aea
+DELETE http://localhost:3001/api/persons/6222229669d8500b65e00d7922
 
 ###
 
