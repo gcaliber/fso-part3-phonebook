@@ -51,8 +51,8 @@ app.post('/api/persons', (request, response, next) => {
     .then(found => {
       if (found) {
         throw {
-          name: "ValidationError", 
-          message: "ValidationError: Name already in database. Names must be unique."
+          name: 'ValidationError', 
+          message: 'ValidationError: Name already in database. Names must be unique.'
         }
       }
       else {
@@ -64,11 +64,11 @@ app.post('/api/persons', (request, response, next) => {
         person.save().then(savedPerson => {
           return response.json(savedPerson)
         })
-        .catch(error => next(error))
+          .catch(error => next(error))
       }
     
-  })
-  .catch(error => next(error))
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
